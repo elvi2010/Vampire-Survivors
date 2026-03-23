@@ -6,7 +6,6 @@
 var GameAI = (function() {
     
     // Сюда будем добавлять функции
-    
     function createEnemy() {
     var diff = GameConfig.getDifficulty();
     
@@ -17,14 +16,11 @@ var GameAI = (function() {
     if (edge === 2) { x = Math.random() * GameState.windowWidth(); y = GameState.windowHeight(); }
     if (edge === 3) { x = 0; y = Math.random() * GameState.windowHeight(); }
 
-    var uiElements = GameUI.createEnemyElement(x, y);
-    
     var role = GameConfig.ROLES[Math.floor(Math.random() * GameConfig.ROLES.length)];
     var flankSide = Math.random() < 0.5 ? 1 : -1;
 
+    // УДАЛЕНО: создание DOM-элементов через GameUI
     GameState.addEnemy({
-        element: uiElements.element,
-        bar: uiElements.bar,
         posX: x,
         posY: y,
         width: GameConfig.GAME_PARAMS.ENEMY_SIZE,
