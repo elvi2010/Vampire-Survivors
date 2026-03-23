@@ -6,7 +6,6 @@
 var GameAI = (function() {
     
     // Сюда будем добавлять функции
-    
     function createEnemy() {
     var diff = GameConfig.getDifficulty();
     
@@ -17,14 +16,11 @@ var GameAI = (function() {
     if (edge === 2) { x = Math.random() * GameState.windowWidth(); y = GameState.windowHeight(); }
     if (edge === 3) { x = 0; y = Math.random() * GameState.windowHeight(); }
 
-    var uiElements = GameUI.createEnemyElement(x, y);
-    
     var role = GameConfig.ROLES[Math.floor(Math.random() * GameConfig.ROLES.length)];
     var flankSide = Math.random() < 0.5 ? 1 : -1;
 
+    // УДАЛЕНО: создание DOM-элементов через GameUI
     GameState.addEnemy({
-        element: uiElements.element,
-        bar: uiElements.bar,
         posX: x,
         posY: y,
         width: GameConfig.GAME_PARAMS.ENEMY_SIZE,
@@ -56,27 +52,30 @@ function shootAtNearestEnemy() {
     }
     if (!nearest) return;
 
-    
     var angle = Math.atan2(nearest.posY - player.y, nearest.posX - player.x);
-    if (player.gun) {
-        player.gun.style.transform = 'rotate(' + (angle * 180 / Math.PI) + 'deg)';
+    
+    // ДОБАВИТЬ: сохранение угла для отрисовки
+    if (typeof GameState.setGunAngle === 'function') {
+        GameState.setGunAngle(angle);
     }
 
-    var bulletEl = GameUI.createBulletElement(player.x + 10, player.y + 10);
-
+    // УДАЛЕНО: создание DOM-элемента пули
     GameState.addBullet({
-        element: bulletEl,
         posX: player.x + 10,
         posY: player.y + 10,
         dx: GameConfig.GAME_PARAMS.BULLET_SPEED * Math.cos(angle),
         dy: GameConfig.GAME_PARAMS.BULLET_SPEED * Math.sin(angle),
         width: GameConfig.GAME_PARAMS.BULLET_SIZE,
-        height: GameConfig.GAME_PARAMS.BULLET_SIZE,
+        height: GameConfig.GAME_PARAMS.BULLET_SIZE
     });
 
     GameState.setAmmoCount(GameState.ammoCount() - 1);
     GameState.setLastShotTime(Date.now());
     GameUI.updateAmmo();
+    
+    if (typeof GameSound !== 'undefined') {
+        GameSound.play('shoot');
+    }
 }
 
 function moveBullets() {
